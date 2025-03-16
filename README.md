@@ -1,3 +1,66 @@
-# 高中自主學習Arduino
-零件:Arduino UNO、超音波測距模組(HC-SR04)、溫溼度測量模組(DHT11)、LCD模組(1602A)、麵包板、杜邦線。
+#include <SimpleDHT.h> 
+#include <LiquidCrystal.h> 
+int trigPin=7; //發出聲波腳位(ESP32 GPIO17)
+int echoPin=6; //接收聲波腳位(ESP32 GPIO16)
+int pinDHT11 = 8;
+LiquidCrystal lcd(12, 11, 10, 5, 4, 3, 2);
+SimpleDHT11 dht11;
+void setup() {
+  lcd.begin(16, 2); 
+  lcd.clear();
+  pinMode(trigPin, OUTPUT);
+  
+  Serial.begin(9600);
+  }
+
+void loop() {
+  
+  byte temperature;
+  byte humidity;
+  
+  int err = SimpleDHTErrSuccess;
+
+  //讀DHT22與檢測Error
+  if ((err = dht11.read(pinDHT11, &temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
+       Serial.print("Read DHT11 failed, err="); Serial.println(err);delay(1000);
+       return;}
+  
+  //serial
+  Serial.println("=================================");
+  Serial.print("Humidity = ");   
+  Serial.print((int)humidity);   
+  Serial.print("% , ");   
+  Serial.print("Temperature = ");   
+  Serial.print((int)temperature);   
+  Serial.println("C ");
+  float soundspeed = (0.03313 + 0.0000606 * temperature) * sqrt(1 + 0.0124 * (humidity / 100.0)); //計算聲速(公分/微秒)
+  unsigned long d=ping()*soundspeed/2; //計算距離(cm)
+  Serial.print(d);
+  Serial.println("cm");
+  
+  //lcd
+  lcd.clear();
+  lcd.print("H=");   
+  lcd.print((int)humidity);   
+  lcd.print("% ,");   
+  lcd.print("T=");   
+  lcd.print((int)temperature);   
+  lcd.print("C");
+  lcd.setCursor(0, 1);
+  lcd.print(d);
+  lcd.print("cm");
+  
+  delay(2000);
+  
+  }
+
+/*ping()=音波來回時間
+ *傳10us的pulse到 HC-SR04 trigger pin
+ */
+unsigned long ping() { 
+  digitalWrite(trigPin, HIGH); //啟動超音波
+  delayMicroseconds(10);  //sustain at least 10us HIGH pulse
+  digitalWrite(trigPin, LOW);  //關閉超音波
+  return pulseIn(echoPin, HIGH); //計算傳回時間
+ }
 
