@@ -1,3 +1,5 @@
+#高中自主學習Arduino
+
 #include <SimpleDHT.h> 
 #include <LiquidCrystal.h> 
 int trigPin=7; //發出聲波腳位(ESP32 GPIO17)
