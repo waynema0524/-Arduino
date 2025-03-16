@@ -2,11 +2,13 @@
 
 #include <SimpleDHT.h> 
 #include <LiquidCrystal.h> 
+
 int trigPin=7; //發出聲波腳位(ESP32 GPIO17)
 int echoPin=6; //接收聲波腳位(ESP32 GPIO16)
 int pinDHT11 = 8;
 LiquidCrystal lcd(12, 11, 10, 5, 4, 3, 2);
 SimpleDHT11 dht11;
+
 void setup() {
   lcd.begin(16, 2); 
   lcd.clear();
